@@ -1,0 +1,18 @@
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED 1
+
+RUN pip install poetry
+
+WORKDIR /app
+
+COPY pyproject.toml /app/
+RUN poetry config virtualenvs.create true \
+    && poetry config virtualenvs.in-project false \
+    && poetry install --no-interaction
+
+COPY . .
+
+RUN poetry install
+
+CMD poetry run processor

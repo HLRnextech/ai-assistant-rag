@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "asset-processor"
+version = "0.1.0"
+description = ""
+authors = ["Abhishek <abhishek@saxecap.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+python-dotenv = "^1.0.1"
+psycopg2-binary = "^2.9.9"
+marshmallow = "^3.21.2"
+boto3 = "^1.34.109"
+wget = "^3.2"
+pdfplumber = "^0.11.0"
+requests = "^2.32.1"
+pandas = "^2.2.2"
+langchain = "^0.2.0"
+langchain-community = "^0.2.0"
+docx2txt = "^0.8"
+langchain-core = "^0.2.1"
+openai = "^1.30.1"
+beautifulsoup4 = "^4.12.3"
+tiktoken = "^0.7.0"
+numpy = "^1.26.4"
+amqpstorm = "^2.10.7"
+sentry-sdk = "^2.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+processor = "asset_processor.runner:main"

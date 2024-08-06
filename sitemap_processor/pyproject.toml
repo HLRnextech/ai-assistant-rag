@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "sitemap-processor"
+version = "0.1.0"
+description = ""
+authors = ["Abhishek <abhishek@saxecap.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+ultimate-sitemap-parser = "^0.5"
+marshmallow = "^3.21.2"
+beautifulsoup4 = "^4.12.3"
+requests = "^2.32.2"
+psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.0.1"
+pandas = "^2.2.2"
+amqpstorm = "^2.10.7"
+sentry-sdk = "^2.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+processor = "sitemap_processor.runner:main"

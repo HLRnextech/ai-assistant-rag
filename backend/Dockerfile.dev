@@ -1,0 +1,21 @@
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED 1
+
+RUN pip install poetry
+
+WORKDIR /app
+
+COPY pyproject.toml /app/
+RUN poetry config virtualenvs.create true \
+    && poetry config virtualenvs.in-project false \
+    && poetry install --no-interaction
+
+
+# Listen to port 5000 at runtime
+EXPOSE 5000
+
+ENV FLASK_DEBUG=1
+
+# Define our command to be run when launching the container
+CMD poetry run flask run --host 0.0.0.0

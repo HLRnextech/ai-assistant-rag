@@ -1,0 +1,175 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backendsvc
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  selector:
+    app: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: nextech
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: apiserver
+          image: 590184135143.dkr.ecr.us-east-1.amazonaws.com/nextech-backend:v1.3
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 1
+            limits:
+              memory: 1.5Gi
+              cpu: 1
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          env:
+            - name: FLASK_APP
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: FLASK_APP
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: ENV
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_PASSWORD
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_HOST
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DATABASE_NAME
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_PORT
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_API_KEY_BACKEND
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_SECRET_ACCESS_KEY
+            - name: AWS_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_ENDPOINT_URL
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_REGION
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_S3_BUCKET
+            - name: CLOUDFRONT_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: CLOUDFRONT_URL
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_RABBITMQ_URL
+            - name: ASSET_PROCESSOR_QUEUE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: ASSET_PROCESSOR_INPUT_QUEUE_NAME
+            - name: SITEMAP_PROCESSOR_QUEUE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: SITEMAP_PROCESSOR_INPUT_QUEUE_NAME
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_REDIS_URL
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_OPENAI_API_KEY
+            - name: OPENAI_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: OPENAI_MODEL
+            - name: OPENAI_EMBEDDING_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: OPENAI_EMBEDDING_MODEL
+            - name: OPENAI_EMBEDDINGS_DIMS
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: OPENAI_EMBEDDINGS_DIMS
+            - name: CHATBOT_JS_ASSET_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: CHATBOT_JS_ASSET_URL
+            - name: CHATBOT_CSS_ASSET_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: CHATBOT_CSS_ASSET_URL
+            - name: SENTRY_DSN
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: SENTRY_DSN

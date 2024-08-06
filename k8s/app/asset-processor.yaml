@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asset-processor
+  namespace: nextech
+spec:
+  selector:
+    matchLabels:
+      app: asset-processor
+  template:
+    metadata:
+      labels:
+        app: asset-processor
+    spec:
+      containers:
+        - name: asset-processor
+          image: 590184135143.dkr.ecr.us-east-1.amazonaws.com/nextech-asset-processor:v1.2
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 500m
+            limits:
+              memory: 1Gi
+              cpu: 1
+          env:
+            - name: ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: ENV
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_PASSWORD
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_HOST
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DATABASE_NAME
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_DB_PORT
+            - name: PRACTICE_URL_SUCCESS_RATE
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: PRACTICE_URL_SUCCESS_RATE
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_RABBITMQ_URL
+            - name: INPUT_QUEUE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: ASSET_PROCESSOR_INPUT_QUEUE_NAME
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_OPENAI_API_KEY
+            - name: OPENAI_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: OPENAI_MODEL
+            - name: OPENAI_EMBEDDING_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: OPENAI_EMBEDDING_MODEL
+            - name: CHUNK_SIZE_TOKENS
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: CHUNK_SIZE_TOKENS
+            - name: CHUNK_OVERLAP_TOKENS
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: CHUNK_OVERLAP_TOKENS
+            - name: OPENAI_EMBEDDINGS_DIMS
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: OPENAI_EMBEDDINGS_DIMS
+            - name: SENTRY_DSN
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: SENTRY_DSN
+            - name: SMARTPROXY_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_SMARTPROXY_AUTH

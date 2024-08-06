@@ -1,0 +1,64 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: esoexternalsecret
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: esosecretstore
+    kind: SecretStore
+  target:
+    name: esosecret
+    creationPolicy: Owner
+  data:
+    - secretKey: NEXTECH_RABBITMQ_URL
+      remoteRef:
+        key: NEXTECH_RABBITMQ_URL
+    - secretKey: NEXTECH_DB_HOST
+      remoteRef:
+        key: NEXTECH_DB_HOST
+    - secretKey: NEXTECH_DATABASE_NAME
+      remoteRef:
+        key: NEXTECH_DATABASE_NAME
+    - secretKey: NEXTECH_DB_PORT
+      remoteRef:
+        key: NEXTECH_DB_PORT
+    - secretKey: NEXTECH_SMARTPROXY_AUTH
+      remoteRef:
+        key: NEXTECH_SMARTPROXY_AUTH
+    - secretKey: NEXTECH_AWS_ACCESS_KEY_ID
+      remoteRef:
+        key: NEXTECH_AWS_ACCESS_KEY_ID
+    - secretKey: NEXTECH_AWS_SECRET_ACCESS_KEY
+      remoteRef:
+        key: NEXTECH_AWS_SECRET_ACCESS_KEY
+    - secretKey: NEXTECH_AWS_ENDPOINT_URL
+      remoteRef:
+        key: NEXTECH_AWS_ENDPOINT_URL
+    - secretKey: NEXTECH_AWS_DEFAULT_REGION
+      remoteRef:
+        key: NEXTECH_AWS_DEFAULT_REGION
+    - secretKey: NEXTECH_S3_BUCKET
+      remoteRef:
+        key: NEXTECH_S3_BUCKET
+    - secretKey: NEXTECH_AWS_REGION
+      remoteRef:
+        key: NEXTECH_AWS_REGION
+    - secretKey: NEXTECH_API_KEY_BACKEND
+      remoteRef:
+        key: NEXTECH_API_KEY_BACKEND
+    - secretKey: NEXTECH_REDIS_URL
+      remoteRef:
+        key: NEXTECH_REDIS_URL
+    - secretKey: NEXTECH_OPENAI_API_KEY
+      remoteRef:
+        key: NEXTECH_OPENAI_API_KEY
+    - secretKey: NEXTECH_DB_USERNAME
+      remoteRef:
+        key: rds!db-63ec70dd-0d9a-423d-90c8-95d63704ae7c
+        property: username
+    - secretKey: NEXTECH_DB_PASSWORD
+      remoteRef:
+        key: rds!db-63ec70dd-0d9a-423d-90c8-95d63704ae7c
+        property: password
+

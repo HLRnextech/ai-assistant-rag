@@ -1,0 +1,20 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: appconfig
+data:
+  ENV: production
+  SITEMAP_PROCESSOR_INPUT_QUEUE_NAME: sitemap-processor
+  ASSET_PROCESSOR_INPUT_QUEUE_NAME: asset-processor
+  SENTRY_DSN: https://9a81d9bf9092afdb7e5565917ed1e983@o4506518737190912.ingest.us.sentry.io/4507487985139712
+  FLASK_APP: manage.py
+  OPENAI_MODEL: gpt-4o
+  OPENAI_EMBEDDING_MODEL: text-embedding-3-large
+  OPENAI_EMBEDDINGS_DIMS: "512"
+  CHATBOT_JS_ASSET_URL: https://d5s3ulactcfpl.cloudfront.net/chatbot/widget.js
+  CHATBOT_CSS_ASSET_URL: https://d5s3ulactcfpl.cloudfront.net/chatbot/widget.css
+  PRACTICE_URL_SUCCESS_RATE: "0.25"
+  CHUNK_SIZE_TOKENS: "512"
+  CHUNK_OVERLAP_TOKENS: "64"
+  CLOUDFRONT_URL: https://d5s3ulactcfpl.cloudfront.net/
+  CF_DISTRIBUTION_ID: E21QHJMVTUQIVL

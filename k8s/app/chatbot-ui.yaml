@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: chatbot-deploy-job
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      containers:
+        - name: chatbot-ui
+          image: 590184135143.dkr.ecr.us-east-1.amazonaws.com/nextech-chatbot-ui:v1.2
+          command: ["bash", "deploy.sh"]
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_SECRET_ACCESS_KEY
+            - name: AWS_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_ENDPOINT_URL
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_AWS_REGION
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: esosecret
+                  key: NEXTECH_S3_BUCKET
+            - name: CF_DISTRIBUTION_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: appconfig
+                  key: CF_DISTRIBUTION_ID
+      restartPolicy: Never
+  backoffLimit: 4

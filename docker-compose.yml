@@ -1,0 +1,136 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./backend:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_interval: 5s
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+      asset_processor:
+        condition: service_started
+      sitemap_processor:
+        condition: service_started
+    env_file:
+      - ./backend/.env.docker
+
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+      dockerfile: Dockerfile
+    healthcheck:
+      test: rabbitmqctl status
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+    volumes:
+      - mq:/var/lib/rabbitmq
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    env_file:
+      - ./localstack/.env.docker
+    volumes:
+      - ./localstack/data:/var/lib/localstack
+      - ./localstack/scripts:/etc/localstack/init/ready.d
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  db:
+    image: ankane/pgvector
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./pg/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: pg_isready -U nextech_user
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    environment:
+      POSTGRES_USER: nextech_user
+      POSTGRES_PASSWORD: nextech_pwd
+      POSTGRES_DB: nextech
+
+  asset_processor:
+    build:
+      context: ./asset_processor
+      dockerfile: Dockerfile.dev
+    depends_on:
+      localstack:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    restart: always
+    volumes:
+      - ./asset_processor:/app
+    env_file:
+      - ./asset_processor/.env.docker
+
+  sitemap_processor:
+    build:
+      context: ./sitemap_processor
+      dockerfile: Dockerfile.dev
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    restart: always
+    volumes:
+      - ./sitemap_processor:/app
+    env_file:
+      - ./sitemap_processor/.env.docker
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+    volumes:
+      - redis_data:/data
+
+  frontend:
+    build:
+      context: ./chatbot_ui
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    restart: always
+    volumes:
+      - ./chatbot_ui:/app
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+  mq:
+  redis_data:

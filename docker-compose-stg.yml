@@ -1,0 +1,120 @@
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: always
+    volumes:
+      - ../certbot/conf:/etc/letsencrypt
+      - ../certbot/www:/var/www/certbot
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_interval: 5s
+    depends_on:
+      # db:
+      #   condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      asset_processor:
+        condition: service_started
+      sitemap_processor:
+        condition: service_started
+    env_file:
+      - ./backend/.env.docker
+
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+      dockerfile: Dockerfile
+    healthcheck:
+      test: rabbitmqctl status
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+    volumes:
+      - mq:/var/lib/rabbitmq
+
+  asset_processor:
+    build:
+      context: ./asset_processor
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      # db:
+      #   condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 5
+    restart: always
+    env_file:
+      - ./asset_processor/.env.docker
+
+  sitemap_processor:
+    build:
+      context: ./sitemap_processor
+      dockerfile: Dockerfile.dev
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      # db:
+      #   condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 2
+    restart: always
+    volumes:
+      - ./sitemap_processor:/app
+    env_file:
+      - ./sitemap_processor/.env.docker
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+    volumes:
+      - redis_data:/data
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ../certbot/conf:/etc/letsencrypt
+      - ../certbot/www:/var/www/certbot
+    command: certonly -v --webroot -w /var/www/certbot --force-renewal --email abhishek@saxecap.com -d nextech-ai-asst-stg.com --agree-tos
+
+  frontend:
+    build:
+      context: ./chatbot_ui
+      dockerfile: Dockerfile
+    restart: no
+    env_file:
+      - ./chatbot_ui/deploy/.env
+
+volumes:
+  pg_data:
+  mq:
+  redis_data:

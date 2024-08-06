@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.ssl
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    volumes:
+      - ../certbot/conf:/etc/letsencrypt
+      - ../certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ../certbot/conf:/etc/letsencrypt
+      - ../certbot/www:/var/www/certbot
+    # for first time setup, use the following command (with force-renewal flag set)
+    command: certonly -v --webroot -w /var/www/certbot --force-renewal --email abhishek@saxecap.com -d nextech-ai-asst-stg.com --agree-tos

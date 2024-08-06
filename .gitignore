@@ -1,0 +1,11 @@
+.env
+.env.docker
+__pycache__
+.DS_Store
+*.pyc
+.pytest_cache
+localstack/data/*
+
+asset_processor/tmp/*
+dist
+node_modules
